@@ -35,7 +35,13 @@
     }
     .ad-slot > div, .ad-slot > ins { max-width: 100%; }
     ins.adsbygoogle { display: block !important; }
+    /* AdSense a besoin d'une largeur explicite sinon : No slot size for availableWidth=0 */
+    #ad-primary { width: 100%; }
+    #ad-fallback { overflow: hidden; }
     #ad-fallback > div { max-width: 100%; }
+    #ad-fallback iframe { border: 0; }
+    .iframe-fit { position: relative; width: 100%; overflow: hidden; }
+    .iframe-fit > iframe { position: absolute; top: 0; left: 0; transform-origin: top left; border: 0; }
     #fallback-status { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 8px; }
   </style>
   <!-- 1) PRIMAIRE : Google AdSense -->
@@ -181,6 +187,44 @@
     var bodySnapshot = 0;
     var chainActive = false;
 
+    // Met une iframe à l'échelle du conteneur (évite l'overflow 728px > 420px)
+    function fitIframe(frame) {
+      try {
+        if (frame.dataset.fitted) return;
+        frame.dataset.fitted = '1';
+        var natW = parseInt(frame.getAttribute('width'), 10) || frame.offsetWidth || 728;
+        var natH = parseInt(frame.getAttribute('height'), 10) || frame.offsetHeight || 90;
+        var wrap = document.createElement('div');
+        wrap.className = 'iframe-fit';
+        frame.parentNode.insertBefore(wrap, frame);
+        wrap.appendChild(frame);
+        frame.style.width = natW + 'px';
+        frame.style.height = natH + 'px';
+        var apply = function () {
+          var avail = wrap.clientWidth || natW;
+          var scale = Math.min(1, avail / natW);
+          frame.style.transform = 'scale(' + scale + ')';
+          wrap.style.height = Math.round(natH * scale) + 'px';
+        };
+        apply();
+        window.addEventListener('resize', apply);
+      } catch (e) {}
+    }
+
+    // Une iframe est "réelle" seulement si elle a un contenu (pas about:blank vide)
+    function iframeHasContent(fr) {
+      try {
+        var src = fr.src || '';
+        if (src && src !== 'about:blank' && src.indexOf('data:') !== 0) return true;
+        var doc = fr.contentDocument;
+        if (doc && doc.body && doc.body.children.length > 0) return true;
+        if (doc && doc.body && (doc.body.innerHTML || '').trim().length > 50) return true;
+      } catch (e) {
+        return true; // cross-origin = on suppose qu'il y a du contenu
+      }
+      return false;
+    }
+
     function hasVisibleAd() {
       // 1) AdSense
       var ins = document.getElementById('ad-primary');
@@ -193,7 +237,15 @@
         for (var i = 0; i < kids.length; i++) {
           var el = kids[i];
           if (el.tagName === 'SCRIPT') continue;
-          if (el.tagName === 'IFRAME') return true; // iframe = tentative faite
+          if (el.tagName === 'IFRAME') {
+            if (iframeHasContent(el)) { fitIframe(el); return true; }
+            continue;
+          }
+          if (el.classList.contains('iframe-fit')) {
+            var inner = el.querySelector('iframe');
+            if (inner && iframeHasContent(inner)) return true;
+            continue;
+          }
           // conteneur Adsterra rempli
           if (el.children.length > 0 && el.offsetHeight > 20) return true;
           // élément sans enfant mais visible (bannière simple)
