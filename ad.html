@@ -129,8 +129,13 @@
       if (monetagLoaded) {
         var mz = document.querySelector('[data-zone-id], .monetag, [id*="monetag"], [class*="monetag"]');
         if (mz && mz.offsetHeight > 10) return true;
-        // détecte n'importe quel élément ajouté après chargement du tag
-        if (document.body.children.length > bodyChildCount) return true;
+        // détecte un élément visible ajouté après le tag (hors scripts)
+        var kids = document.body.children;
+        var added = 0;
+        for (var i = bodyChildCount; i < kids.length; i++) {
+          if (kids[i].tagName !== 'SCRIPT' && kids[i].offsetHeight > 10) added++;
+        }
+        if (added > 0) return true;
       }
       return false;
     }
