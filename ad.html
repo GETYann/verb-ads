@@ -67,9 +67,9 @@
     // ============================================================
 
     var ADSTERRA_TAGS = [
+      { path: '1',  hash: '8d89bb3de39d17f17e2cb18832f34a48', container: false }, // prioritaire
       { path: '21', hash: '303483616a3ae887c7a19116e56ecccf', container: true  }, // Native / Social Bar
-      { path: '14', hash: '00ca0c186251734dde4cd60a985d45fe', container: false },
-      { path: '1',  hash: '8d89bb3de39d17f17e2cb18832f34a48', container: false }
+      { path: '14', hash: '00ca0c186251734dde4cd60a985d45fe', container: false }
     ];
 
     // Bannière Adsterra 728x90 (format atOptions)
@@ -196,18 +196,20 @@
           if (el.tagName === 'IFRAME') return true; // iframe = tentative faite
           // conteneur Adsterra rempli
           if (el.children.length > 0 && el.offsetHeight > 20) return true;
+          // élément sans enfant mais visible (bannière simple)
+          if (el.offsetHeight > 40 && el.offsetWidth > 100) return true;
         }
       }
 
-      // 3) Monetag injecte directement dans <body>
+      // 3) Réseaux injectant directement dans <body> (Adsterra sans container, Monetag…)
       if (chainActive) {
         var body = document.body.children;
         for (var j = bodySnapshot; j < body.length; j++) {
           var b = body[j];
-          if (b.tagName === 'SCRIPT') continue;
-          if (b.offsetHeight > 30 && b.children.length > 0) return true;
+          if (b.tagName === 'SCRIPT' || b.tagName === 'STYLE' || b.tagName === 'LINK') continue;
+          if (b.offsetHeight > 30 && b.offsetWidth > 50) return true;
         }
-        var mz = document.querySelector('[class*="monetag"], [id*="monetag"], [class*="in-page"]');
+        var mz = document.querySelector('[class*="monetag"], [id*="monetag"], [class*="in-page"], [id^="container-"]');
         if (mz && mz.offsetHeight > 30) return true;
       }
       return false;
@@ -227,14 +229,13 @@
       document.getElementById('ad-primary').style.display = 'none';
       document.getElementById('ad-fallback').style.display = 'block';
 
-      if (fb.type === 'monetag') {
-        chainActive = true;
-        bodySnapshot = document.body.children.length;
-      }
+      // Snapshot du <body> AVANT injection, pour détecter ce qui arrive après
+      chainActive = true;
+      bodySnapshot = document.body.children.length;
 
       try { fb.load(); } catch (e) { tryNextFallback(); return; }
 
-      var delay = (fb.type === 'monetag' || fb.type === 'adsterra') ? 6000 : 5000;
+      var delay = (fb.type === 'monetag' || fb.type === 'adsterra') ? 7000 : 5000;
       setTimeout(function () {
         if (!hasVisibleAd()) tryNextFallback();
       }, delay);
