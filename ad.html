@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="monetag" content="4293fb3eceaaecb28088ce4393bd5b6f">
   <title>Verb - Publicité</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -225,10 +226,21 @@
       return false;
     }
 
-    function hasVisibleAd() {
-      // 1) AdSense
+    // AdSense écrit lui-même data-ad-status : "filled" | "unfilled" | absent = en cours
+    function adsenseState() {
       var ins = document.getElementById('ad-primary');
-      if (ins && ins.offsetHeight > 10 && ins.innerHTML.trim() !== '') return true;
+      if (!ins) return 'absent';
+      var st = (ins.getAttribute('data-ad-status') || '').toLowerCase();
+      if (st) return st;
+      // filet de sécurité si l'attribut n'est pas présent
+      if (ins.offsetHeight > 10 && ins.innerHTML.trim() !== '' &&
+          ins.querySelector('iframe:not([src*="about:blank"])')) return 'filled';
+      return 'pending';
+    }
+
+    function hasVisibleAd() {
+      // 1) AdSense : uniquement si Google a réellement rempli la pub
+      if (adsenseState() === 'filled') return true;
 
       // 2) Conteneurs injectés dans #ad-fallback (Adsterra avec container, iframe, etc.)
       var fb = document.getElementById('ad-fallback');
