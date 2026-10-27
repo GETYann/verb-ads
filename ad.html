@@ -64,7 +64,19 @@
     // ============================================================
 
     var FALLBACKS = [
-      // --- 2) PROPELLERADS (bannière) ---
+      // --- 2) MONETAG (lien direct, zone déjà active) ---
+      {
+        name: 'Monetag',
+        id: 'https://uplcm.com/4/12131287',  // lien direct Monetag
+        load: function () {
+          var f = document.createElement('iframe');
+          f.src = this.id;
+          f.style.cssText = 'width:100%;min-height:100px;border:0;background:#0D1B2A;';
+          f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');
+          document.getElementById('ad-fallback').appendChild(f);
+        }
+      },
+      // --- 3) PROPELLERADS (bannière) ---
       {
         name: 'PropellerAds',
         id: 'REPLACE_PROPELLER_ZONE_ID',   // ex: 1234567
@@ -75,7 +87,7 @@
           document.getElementById('ad-fallback').appendChild(s);
         }
       },
-      // --- 3) ADSTERRA (bannière 320x50 / 728x90 selon le format choisi) ---
+      // --- 4) ADSTERRA (bannière 320x50 / 728x90 selon le format choisi) ---
       {
         name: 'Adsterra',
         id: 'REPLACE_ADSTERRA_KEY',        // clé atOptions
@@ -90,9 +102,9 @@
           document.getElementById('ad-fallback').appendChild(inv);
         }
       },
-      // --- 4) MONETAG (bannière) ---
+      // --- 5) MONETAG (bannière via zone ID) ---
       {
-        name: 'Monetag',
+        name: 'Monetag zone',
         id: 'REPLACE_MONETAG_PID',          // ex: 9xxxxxx
         load: function () {
           var s = document.createElement('script');
