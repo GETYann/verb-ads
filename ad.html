@@ -27,13 +27,15 @@
     .ad-slot {
       width: 100%;
       max-width: 480px;
-      min-height: 100px;
+      min-height: 120px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
     }
+    .ad-slot > div, .ad-slot > ins { max-width: 100%; }
     ins.adsbygoogle { display: block !important; }
+    #ad-fallback > div { max-width: 100%; }
     #fallback-status { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 8px; }
   </style>
   <!-- 1) PRIMAIRE : Google AdSense -->
@@ -52,23 +54,80 @@
          data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 
-    <!-- Conteneurs de secours (injectés uniquement si AdSense ne s'affiche pas) -->
+    <!-- Conteneur des secours (injectés uniquement si AdSense ne s'affiche pas) -->
     <div id="ad-fallback" style="width:100%; display:none;"></div>
     <div id="fallback-status"></div>
   </div>
 
   <script>
     // ============================================================
-    // CHAÎNE DE RESSOURCE : AdSense -> PropellerAds -> Adsterra -> Monetag
-    // Chaque ID ci-dessous doit être remplacé par TON ID après création du compte.
+    // CHAÎNE DE RESSOURCE :
+    // AdSense -> Adsterra (3 tags) -> Monetag (zone) -> Monetag (direct)
+    // Un seul réseau affiché à la fois, on avance si rien ne s'affiche.
     // ============================================================
 
+    var ADSTERRA_TAGS = [
+      { path: '21', hash: '303483616a3ae887c7a19116e56ecccf', container: true  }, // Native / Social Bar
+      { path: '14', hash: '00ca0c186251734dde4cd60a985d45fe', container: false },
+      { path: '1',  hash: '8d89bb3de39d17f17e2cb18832f34a48', container: false }
+    ];
+
+    // Bannière Adsterra 728x90 (format atOptions)
+    var ADSTERRA_BANNER = {
+      key: '9fb9ff5b6726bc946b29b88fa8f2efe9',
+      src: 'https://bauval.org/22/9fb9ff5b6726bc946b29b88fa8f2efe9'
+    };
+
+    // Lien direct supplémentaire
+    var DIRECT_LINK = 'https://araplhn.org/4/7ee0af34737db76af73c0203f83e0433';
+
+    function makeAdsterraEntry(t) {
+      return {
+        name: 'Adsterra ' + t.path,
+        id: t.hash,
+        type: 'adsterra',
+        container: t.container,
+        load: function () {
+          var box = document.getElementById('ad-fallback');
+          if (this.container) {
+            var d = document.createElement('div');
+            d.id = 'container-' + this.id;
+            d.style.cssText = 'width:100%;min-height:90px;';
+            box.appendChild(d);
+          }
+          var s = document.createElement('script');
+          s.async = true;
+          s.setAttribute('data-cfasync', 'false');
+          s.src = 'https://bauval.org/' + t.path + '/' + t.hash;
+          box.appendChild(s);
+        }
+      };
+    }
+
     var FALLBACKS = [
-      // --- 2) MONETAG (zone In-Page Push / bannière) ---
+      // --- 2) ADSTERRA : bannière 728x90 (meilleur format pour notre conteneur) ---
+      {
+        name: 'Adsterra banner 728x90',
+        id: ADSTERRA_BANNER.key,
+        type: 'adsterra',
+        load: function () {
+          var box = document.getElementById('ad-fallback');
+          var conf = document.createElement('script');
+          conf.text = 'atOptions = { "key": "' + ADSTERRA_BANNER.key + '", "format": "iframe", "height": 90, "width": 728, "params": {} };';
+          box.appendChild(conf);
+          var inv = document.createElement('script');
+          inv.async = true;
+          inv.setAttribute('data-cfasync', 'false');
+          inv.src = ADSTERRA_BANNER.src;
+          box.appendChild(inv);
+        }
+      }
+    ].concat(ADSTERRA_TAGS.map(makeAdsterraEntry)).concat([
+      // --- Monetag : zone In-Page Push / bannière ---
       {
         name: 'Monetag zone',
         id: '6153743',
-        waitForBody: true,
+        type: 'monetag',
         load: function () {
           var s = document.createElement('script');
           s.async = true;
@@ -77,22 +136,24 @@
           document.body.appendChild(s);
         }
       },
-      // --- 3) MONETAG (lien direct) ---
+      // --- Monetag : lien direct ---
       {
         name: 'Monetag direct',
-        id: 'https://uplcm.com/4/12131287',  // lien direct Monetag
+        id: 'https://uplcm.com/4/12131287',
+        type: 'iframe',
         load: function () {
           var f = document.createElement('iframe');
           f.src = this.id;
-          f.style.cssText = 'width:100%;min-height:100px;border:0;background:#0D1B2A;';
+          f.style.cssText = 'width:100%;min-height:110px;border:0;background:#0D1B2A;';
           f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');
           document.getElementById('ad-fallback').appendChild(f);
         }
       },
-      // --- 4) PROPELLERADS (bannière) ---
+      // --- PropellerAds (à configurer : remplacer REPLACE_...) ---
       {
         name: 'PropellerAds',
-        id: 'REPLACE_PROPELLER_ZONE_ID',   // ex: 1234567
+        id: 'REPLACE_PROPELLER_ZONE_ID',
+        type: 'propeller',
         load: function () {
           var s = document.createElement('script');
           s.async = true;
@@ -100,42 +161,54 @@
           document.getElementById('ad-fallback').appendChild(s);
         }
       },
-      // --- 5) ADSTERRA (bannière 320x50 / 728x90 selon le format choisi) ---
+      // --- Lien direct supplémentaire (dernier recours) ---
       {
-        name: 'Adsterra',
-        id: 'REPLACE_ADSTERRA_KEY',        // clé atOptions
+        name: 'Direct link',
+        id: DIRECT_LINK,
+        type: 'iframe',
         load: function () {
-          var conf = document.createElement('script');
-          conf.type = 'text/javascript';
-          conf.text = 'atOptions = { "key": "' + this.id + '", "format": "iframe", "height": 90, "width": 728, "params": {} };';
-          document.getElementById('ad-fallback').appendChild(conf);
-          var inv = document.createElement('script');
-          inv.async = true;
-          inv.src = '//' + this.id.toLowerCase() + '/invoke.js';
-          document.getElementById('ad-fallback').appendChild(inv);
+          var f = document.createElement('iframe');
+          f.src = this.id;
+          f.style.cssText = 'width:100%;min-height:110px;border:0;background:#0D1B2A;';
+          f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');
+          document.getElementById('ad-fallback').appendChild(f);
         }
       }
-    ];
+    ]);
 
     var fallbackIndex = -1;
     var statusEl = document.getElementById('fallback-status');
+    var bodySnapshot = 0;
+    var chainActive = false;
 
     function hasVisibleAd() {
+      // 1) AdSense
       var ins = document.getElementById('ad-primary');
       if (ins && ins.offsetHeight > 10 && ins.innerHTML.trim() !== '') return true;
+
+      // 2) Conteneurs injectés dans #ad-fallback (Adsterra avec container, iframe, etc.)
       var fb = document.getElementById('ad-fallback');
-      if (fb && fb.offsetHeight > 10 && fb.children.length > 0) return true;
-      // Monetag injecte ses éléments directement dans <body>
-      if (monetagLoaded) {
-        var mz = document.querySelector('[data-zone-id], .monetag, [id*="monetag"], [class*="monetag"]');
-        if (mz && mz.offsetHeight > 10) return true;
-        // détecte un élément visible ajouté après le tag (hors scripts)
-        var kids = document.body.children;
-        var added = 0;
-        for (var i = bodyChildCount; i < kids.length; i++) {
-          if (kids[i].tagName !== 'SCRIPT' && kids[i].offsetHeight > 10) added++;
+      if (fb) {
+        var kids = fb.children;
+        for (var i = 0; i < kids.length; i++) {
+          var el = kids[i];
+          if (el.tagName === 'SCRIPT') continue;
+          if (el.tagName === 'IFRAME') return true; // iframe = tentative faite
+          // conteneur Adsterra rempli
+          if (el.children.length > 0 && el.offsetHeight > 20) return true;
         }
-        if (added > 0) return true;
+      }
+
+      // 3) Monetag injecte directement dans <body>
+      if (chainActive) {
+        var body = document.body.children;
+        for (var j = bodySnapshot; j < body.length; j++) {
+          var b = body[j];
+          if (b.tagName === 'SCRIPT') continue;
+          if (b.offsetHeight > 30 && b.children.length > 0) return true;
+        }
+        var mz = document.querySelector('[class*="monetag"], [id*="monetag"], [class*="in-page"]');
+        if (mz && mz.offsetHeight > 30) return true;
       }
       return false;
     }
@@ -147,27 +220,25 @@
         return;
       }
       var fb = FALLBACKS[fallbackIndex];
-      if (fb.id.indexOf('REPLACE_') === 0) {
-        // ID pas encore configuré -> on tente le suivant
-        tryNextFallback();
+      if (String(fb.id).indexOf('REPLACE_') === 0) {
+        tryNextFallback(); // ID non configuré -> on passe au suivant
         return;
       }
       document.getElementById('ad-primary').style.display = 'none';
       document.getElementById('ad-fallback').style.display = 'block';
-      if (fb.waitForBody) {
-        monetagLoaded = true;
-        bodyChildCount = document.body.children.length;
+
+      if (fb.type === 'monetag') {
+        chainActive = true;
+        bodySnapshot = document.body.children.length;
       }
+
       try { fb.load(); } catch (e) { tryNextFallback(); return; }
-      // Si ce réseau ne fill pas non plus -> suivant
-      var delay = fb.waitForBody ? 6000 : 5000;
+
+      var delay = (fb.type === 'monetag' || fb.type === 'adsterra') ? 6000 : 5000;
       setTimeout(function () {
         if (!hasVisibleAd()) tryNextFallback();
       }, delay);
     }
-
-    var monetagLoaded = false;
-    var bodyChildCount = 0;
 
     // Vérifie AdSense après 6 secondes
     setTimeout(function () {
