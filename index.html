@@ -3,55 +3,191 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verb - Publicité</title>
+  <title>Verb - Conjugaison intelligente | Application Windows</title>
+  <meta name="description" content="Verb est une application Windows de conjugaison intelligente en français, anglais, allemand et espagnol. Déclenchez la conjugaison par raccourci clavier, avec IA intégrée.">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
       background: #0D1B2A;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      overflow: hidden;
+      color: #E6EDF3;
+      line-height: 1.7;
+    }
+    .container { max-width: 860px; margin: 0 auto; padding: 40px 20px; }
+    header { text-align: center; padding: 50px 20px 30px; }
+    .logo {
+      font-size: 56px;
+      font-weight: bold;
+      color: #4A90D9;
+      letter-spacing: 2px;
+      text-shadow: 0 0 20px rgba(74,144,217,0.5);
+    }
+    .tagline { font-size: 17px; color: rgba(255,255,255,0.65); margin-top: 8px; }
+    h2 {
+      font-size: 22px;
+      color: #4A90D9;
+      margin: 36px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(74,144,217,0.25);
+    }
+    p { margin-bottom: 14px; font-size: 15.5px; color: rgba(230,237,243,0.9); }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .card {
+      background: rgba(74,144,217,0.08);
+      border: 1px solid rgba(74,144,217,0.3);
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .card h3 { font-size: 16px; color: #4A90D9; margin-bottom: 6px; }
+    .card p { font-size: 14px; color: rgba(230,237,243,0.8); margin: 0; }
+    ul { margin: 0 0 16px 22px; font-size: 15.5px; }
+    li { margin-bottom: 8px; }
+    .ad-box {
+      margin: 30px 0;
+      padding: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      text-align: center;
     }
     .ad-label {
       font-size: 10px;
       color: rgba(255,255,255,0.4);
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
-    .ad-slot {
-      width: 100%;
-      max-width: 480px;
-      min-height: 90px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    a { color: #4A90D9; }
+    .cta {
+      display: inline-block;
+      background: #4A90D9;
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 12px;
     }
-    /* Force l'affichage de la pub sur fond sombre */
-    ins.adsbygoogle { display: block !important; }
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+    }
+    footer a { color: #4A90D9; }
   </style>
-  <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5698690251461782" crossorigin="anonymous"></script>
 </head>
 <body>
-  <div class="ad-label">Publicité</div>
+  <header>
+    <div class="logo">#Verb</div>
+    <div class="tagline">Votre assistant intelligent de conjugaison — Windows</div>
+  </header>
 
-  <div class="ad-slot">
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-5698690251461782"
-         data-ad-slot="9956769655"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+  <div class="container">
+    <h2>Qu'est-ce que Verb ?</h2>
+    <p>
+      <strong>Verb</strong> est une application Windows qui conjugue n'importe quel verbe
+      instantanément, directement depuis votre clavier. Sélectionnez un verbe dans un
+      document, tapez votre raccourci, et Verb affiche la conjugaison complète — sans
+      quitter votre travail.
+    </p>
+    <p>
+      Conçu pour les étudiants, enseignants, traducteurs et tous les apprenants de
+      langues, Verb combine une analyse grammaticale locale et une intelligence
+      artificielle pour proposer des conjugaisons précises et contextualisées.
+    </p>
+
+    <div class="ad-box">
+      <div class="ad-label">Publicité</div>
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-5698690251461782"
+           data-ad-slot="9956769655"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+    <h2>Fonctionnalités principales</h2>
+    <div class="features">
+      <div class="card">
+        <h3>⌨️ Déclencheur clavier</h3>
+        <p>Tapez <strong>###</strong> devant un verbe et la fenêtre de conjugaison apparaît instantanément.</p>
+      </div>
+      <div class="card">
+        <h3>🌍 4 langues</h3>
+        <p>Français, anglais, allemand et espagnol avec tous les temps et modes.</p>
+      </div>
+      <div class="card">
+        <h3>🤖 IA intégrée</h3>
+        <p>Analyse contextuelle du verbe, du pronom et du genre pour une conjugaison exacte.</p>
+      </div>
+      <div class="card">
+        <h3>📋 Texte sélectionné</h3>
+        <p>Détecte le verbe et le pronom directement dans la sélection de votre presse-papier.</p>
+      </div>
+      <div class="card">
+        <h3>🎯 Genre strict</h3>
+        <p>il / elle / ils / elles → accords masculin, féminin, pluriel corrects automatiquement.</p>
+      </div>
+      <div class="card">
+        <h3>🔒 100% local</h3>
+        <p>L'analyse grammaticale s'exécute sur votre ordinateur. Aucun texte envoyé en ligne.</p>
+      </div>
+    </div>
+
+    <h2>Temps et modes conjugués</h2>
+    <ul>
+      <li><strong>Indicatif</strong> : présent, imparfait, futur, passé simple, plus-que-parfait, futur antérieur…</li>
+      <li><strong>Subjonctif</strong> : présent, imparfait, plus-que-parfait</li>
+      <li><strong>Conditionnel</strong> : présent, passé</li>
+      <li><strong>Impératif</strong> : présent, passé</li>
+      <li><strong>Participe &amp; gérondif</strong> : formes simples et composées</li>
+    </ul>
+
+    <div class="ad-box">
+      <div class="ad-label">Publicité</div>
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-5698690251461782"
+           data-ad-slot="9956769655"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+    <h2>Premium &amp; Pro</h2>
+    <p>
+      Verb est gratuit avec un quota quotidien d'utilisations. Passez à
+      <strong>Premium</strong> pour un accès illimité, ou <strong>Pro</strong> pour
+      les fonctions avancées et l'absence totale de publicité. Les achats sont
+      traités sécuritairement par le Microsoft Store.
+    </p>
+
+    <h2>Vie privée</h2>
+    <p>
+      Verb analyse vos textes <strong>localement</strong>, sans transmission à des
+      serveurs. Consultez notre
+      <a href="confidentialite.html">politique de confidentialité</a> pour connaître
+      l'ensemble des données traitées.
+    </p>
+
+    <div style="text-align:center; margin-top:24px;">
+      <a class="cta" href="https://github.com/GETYann/verb-ads/issues">Signaler un problème</a>
+    </div>
   </div>
 
-  <script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
+  <footer>
+    © 2026 Verb — PlanB ·
+    <a href="confidentialite.html">Confidentialité</a> ·
+    <a href="ad.html">Page publicitaire</a>
+  </footer>
 </body>
 </html>
