@@ -64,9 +64,22 @@
     // ============================================================
 
     var FALLBACKS = [
-      // --- 2) MONETAG (lien direct, zone déjà active) ---
+      // --- 2) MONETAG (zone In-Page Push / bannière) ---
       {
-        name: 'Monetag',
+        name: 'Monetag zone',
+        id: '6153743',
+        waitForBody: true,
+        load: function () {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://fpyf8.com/88/tag.min.js';
+          s.setAttribute('data-zone', this.id);
+          document.body.appendChild(s);
+        }
+      },
+      // --- 3) MONETAG (lien direct) ---
+      {
+        name: 'Monetag direct',
         id: 'https://uplcm.com/4/12131287',  // lien direct Monetag
         load: function () {
           var f = document.createElement('iframe');
@@ -76,7 +89,7 @@
           document.getElementById('ad-fallback').appendChild(f);
         }
       },
-      // --- 3) PROPELLERADS (bannière) ---
+      // --- 4) PROPELLERADS (bannière) ---
       {
         name: 'PropellerAds',
         id: 'REPLACE_PROPELLER_ZONE_ID',   // ex: 1234567
@@ -87,7 +100,7 @@
           document.getElementById('ad-fallback').appendChild(s);
         }
       },
-      // --- 4) ADSTERRA (bannière 320x50 / 728x90 selon le format choisi) ---
+      // --- 5) ADSTERRA (bannière 320x50 / 728x90 selon le format choisi) ---
       {
         name: 'Adsterra',
         id: 'REPLACE_ADSTERRA_KEY',        // clé atOptions
@@ -101,18 +114,6 @@
           inv.src = '//' + this.id.toLowerCase() + '/invoke.js';
           document.getElementById('ad-fallback').appendChild(inv);
         }
-      },
-      // --- 5) MONETAG (bannière via zone ID) ---
-      {
-        name: 'Monetag zone',
-        id: 'REPLACE_MONETAG_PID',          // ex: 9xxxxxx
-        load: function () {
-          var s = document.createElement('script');
-          s.async = true;
-          s.src = 'https://fpyf8.com/88/tag.min.js';
-          s.setAttribute('data-zone', this.id);
-          document.getElementById('ad-fallback').appendChild(s);
-        }
       }
     ];
 
@@ -124,6 +125,13 @@
       if (ins && ins.offsetHeight > 10 && ins.innerHTML.trim() !== '') return true;
       var fb = document.getElementById('ad-fallback');
       if (fb && fb.offsetHeight > 10 && fb.children.length > 0) return true;
+      // Monetag injecte ses éléments directement dans <body>
+      if (monetagLoaded) {
+        var mz = document.querySelector('[data-zone-id], .monetag, [id*="monetag"], [class*="monetag"]');
+        if (mz && mz.offsetHeight > 10) return true;
+        // détecte n'importe quel élément ajouté après chargement du tag
+        if (document.body.children.length > bodyChildCount) return true;
+      }
       return false;
     }
 
@@ -141,12 +149,20 @@
       }
       document.getElementById('ad-primary').style.display = 'none';
       document.getElementById('ad-fallback').style.display = 'block';
+      if (fb.waitForBody) {
+        monetagLoaded = true;
+        bodyChildCount = document.body.children.length;
+      }
       try { fb.load(); } catch (e) { tryNextFallback(); return; }
-      // Si ce réseau ne fill pas non plus dans les 5s -> suivant
+      // Si ce réseau ne fill pas non plus -> suivant
+      var delay = fb.waitForBody ? 6000 : 5000;
       setTimeout(function () {
         if (!hasVisibleAd()) tryNextFallback();
-      }, 5000);
+      }, delay);
     }
+
+    var monetagLoaded = false;
+    var bodyChildCount = 0;
 
     // Vérifie AdSense après 6 secondes
     setTimeout(function () {

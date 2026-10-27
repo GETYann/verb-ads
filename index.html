@@ -189,5 +189,16 @@
     <a href="confidentialite.html">Confidentialité</a> ·
     <a href="ad.html">Page publicitaire</a>
   </footer>
+
+  <script>
+    // Enregistrement du service worker (requis pour vérification Monetag)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/verb-ads/sw.js', { scope: '/verb-ads/' })
+          .then(function (reg) { console.log('SW enregistré:', reg.scope); })
+          .catch(function (err) { console.log('SW erreur:', err); });
+      });
+    }
+  </script>
 </body>
 </html>
